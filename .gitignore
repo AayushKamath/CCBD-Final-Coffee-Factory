@@ -4,3 +4,4 @@ my-app/.idea/inspectionProfiles/Project_Default.xml
 my-app/.idea/modules.xml
 my-app/.idea/my-app.iml
 my-app/.idea/vcs.xml
+.node_modules
