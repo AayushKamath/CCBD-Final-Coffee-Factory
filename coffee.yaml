@@ -1,0 +1,308 @@
+swagger: "2.0"
+info:
+  description: "API for The Coffee Factory."
+  version: "1.0.0"
+  title: "The Coffee Factory v2"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+# host: "petstore.swagger.io"
+# basePath: "/v2"
+tags:
+- name: "Recommendations"
+  description: "Give recommendations for shops"
+- name: "Likes"
+  description: "Interact with likes"
+- name: "Reviews"
+  description: "Interact with reviews"
+- name: "Shops"
+  description: "Interact with shops"
+schemes:
+- "https"
+- "http"
+paths:
+  /getRecommendations/{geoLoc}:
+    get:
+      tags:
+      - "Recommendations"
+      summary: "Get recommendations for the specified area"
+      description: "Returns a list of recommendations"
+      operationId: "getRecommendationsByGeoLoc"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "geoLoc"
+        in: "path"
+        description: "User's geographic location"
+        required: true
+        type:
+          "array"
+        items:
+          type:
+            "number"
+          format:
+            "float"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type:
+              "array"
+            items: 
+              $ref: "#/definitions/CoffeeShop"
+        # "400":
+        #   description: "Invalid GeoLoc supplied"
+        # "404":
+        #   description: "Couldn't reach page"
+  /getShopDetails/{shopName}:
+    get:
+      tags:
+      - "Shops"
+      operationId: "getShopDetailsByShopname"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "shopName"
+        in: "path"
+        required: true
+        type:
+          "string"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/CoffeeShopDetails"
+  /getLikes:
+    get:
+      tags:
+      - "Likes"
+      operationId: "getLikes"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type:
+              "array"
+            items: 
+              $ref: "#/definitions/CoffeeShop"
+  /like:
+    post:
+      tags:
+      - "Likes"
+      operationId: "like"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "ShopID"
+        description: "Shop that was liked"
+        required: true
+        schema:
+          type:
+            "string"
+      responses:
+        "200":
+          description: "successful operation"
+  /getProfile:
+    get:
+      tags:
+      - "Profile"
+      operationId: "getProfile"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type:
+              "array"
+            items: 
+              $ref: "#/definitions/ProfileData"
+  
+  /searchUserQuery:
+    get:
+      tags:
+      - "Shops"
+      operationId: "searchUserQuery"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type:
+              "array"
+            items: 
+              $ref: "#/definitions/CoffeeShop"
+              
+  /submitReview:
+    post:
+      tags:
+      - "Reviews"
+      operationId: "submitReview"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "Review"
+        description: "submitted review"
+        required: true
+        schema:
+          $ref: "#/definitions/Review"
+      responses:
+        "200":
+          description: "successful operation"
+# securityDefinitions:
+#   petstore_auth:
+#     type: "oauth2"
+#     authorizationUrl: "http://petstore.swagger.io/oauth/dialog"
+#     flow: "implicit"
+#     scopes:
+#       write:pets: "modify pets in your account"
+#       read:pets: "read your pets"
+#   api_key:
+#     type: "apiKey"
+#     name: "api_key"
+#     in: "header"
+definitions:
+
+  CoffeeShop:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      name:
+        type: "string"
+      address:
+        type: "string"
+      num_reviews:
+        type: "integer"
+        format: "int32"
+      average_rating:
+        type: "number"
+        format: "float"
+      imageURLs:
+        type: "array"
+        items: 
+          $ref: "#/definitions/S3File"
+  CoffeeShopDetails:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      name:
+        type: "string"
+      num_reviews:
+        type: "integer"
+        format: "int32"
+      average_rating:
+        type: "number"
+        format: "float"
+      imageURLs:
+        type: "array"
+        items: 
+          $ref: "#/definitions/S3File"
+      ratings:
+        type: "object"
+        format: $ref "#/definitions/Ratings"
+      categories:
+        type: "object"
+        format: $ref "#/definitions/Categories"
+      offerings:
+        type: "object"
+        format: $ref "#/definitions/Offerings"
+      reviews:
+        type: "array"
+        items: 
+          $ref: "#/definitions/Review"
+  S3File:
+    type: "object"
+    properties:
+      bucket: 
+        type: "string"
+      key:
+        type: "string"
+  Ratings:
+    type: "object"
+    properties:
+      Quality: 
+        type: "number"
+      Crowd: 
+        type: "number"
+      Value: 
+        type: "number"
+  Categories:
+    type: "object"
+    properties:
+      Social:
+        type: "boolean"
+      GoodForDates:
+        type: "boolean"
+      Value:
+        type: "boolean"
+  Offerings:
+    type: "object"
+    properties:
+      PourOver:
+        type: "boolean"
+      SingleOrigin:
+        type: "boolean"
+      Meal:
+        type: "boolean"
+      Dessert:
+        type: "boolean"
+  Review:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      reviewer_name:
+        type: "string"
+      reviewer_id:
+        type: "string"
+      review_text:
+        type: "string"
+      rating:
+        type: "number"
+  ProfileData:
+    type: "object"
+    properties:
+      user_id:
+        type: "string"
+      name:
+        type: "string"
+      phone_number:
+        type: "string"
+      location:
+        type: "string"
+      age:
+        type: "integer"
+      favorite_coffee:
+        type: "string"
+      reviews:
+        type: "array"
+        items:
+          $ref: "#/definitions/Review"
+      profile_picture:
+        type: "object"
+        format: $ref "#/definitions/S3URL"
+      liked_shops:
+        type: "array"
+        items:
+          $ref: "CoffeeShop"
+  
